@@ -1,67 +1,53 @@
-import XMonad
-import XMonad.Actions.SpawnOn
-import XMonad.Actions.Launcher
-import Graphics.X11.Xlib
-import XMonad.Hooks.DynamicLog
-import XMonad.Hooks.EwmhDesktops
-import XMonad.Hooks.FadeInactive
-import XMonad.Hooks.ManageDocks
-import XMonad.Hooks.ManageHelpers
-import XMonad.Layout.Spacing
-import XMonad.Layout.Spiral
-import XMonad.Layout.Accordion
-import XMonad.Prompt
-import XMonad.Prompt(def)
-import XMonad.Prompt.Man
-import XMonad.Prompt.Shell
-import XMonad.Prompt.XMonad
-import XMonad.Util.EZConfig(additionalKeys)
-import XMonad.Util.EZConfig(additionalKeysP)
-import XMonad.Util.EZConfig
-import XMonad.Util.Run(spawnPipe)
-import System.IO
+-- Imports.
+ import XMonad
+ import XMonad.Hooks.DynamicLog
+ import XMonad.Hooks.EwmhDesktops
+ import XMonad.Layout.Spacing
+ import XMonad.Layout.Spiral
+ import XMonad.Layout.Grid
+ import XMonad.Layout.Accordion
+ import XMonad.Actions.CycleWS
+ import XMonad.Util.EZConfig
+ import XMonad.Hooks.WorkspaceHistory (workspaceHistoryHook)
+ import XMonad.Hooks.FadeInactive
 
+ -- The main function.
+ main = xmonad =<< statusBar myBar myPP toggleStrutsKey myConfig
 
-main = xmonad =<< statusBar myBar myPP toggleStrutKey myConfig
+ -- Command to launch the bar.
+ myBar = "xmobar"
 
-myBar = "/usr/bin/xmobar"
+ -- Custom PP, configure it as you like. It determines what is being written to the bar.
+ myPP = xmobarPP { ppCurrent = xmobarColor "#429942" "" . wrap "<" ">" }
 
-myPP = xmobarPP { ppCurrent = xmobarColor "purple" "" . wrap "{" "}" }
+ -- Key binding to toggle the gap for the bar.
+ toggleStrutsKey XConfig {XMonad.modMask = modMask} = (modMask, xK_b)
 
+    -- Layouts
+ myLayout = spacingRaw True (Border 0 5 5 5) True (Border 5 5 5 5) True $
+        layoutTall ||| layoutMirror ||| layoutFull ||| layoutSpiral ||| layoutGrid ||| layoutAccordion where
+        layoutTall = Tall 1 (3/100) (1/2) 
+	layoutFull = Full
+        layoutSpiral = spiral (125 / 146)
+        layoutGrid = Grid
+        layoutMirror = Mirror (Tall 1 (3/100) (3/5))
+        layoutAccordion = Accordion
 
-toggleStrutKey XConfig {XMonad.modMask = modMask} = (modMask, xK_b)
+ -- Keys 
 
-myPrompt = defaultXPConfig {
-	fgColor = "purple"
-	, bgColor = "black"
-	, font = "xft:JetBrains Mono:size=14"
-	, height = 36
-}
-
-myConfig = defaultConfig { 
-         modMask = mod4Mask
-         , startupHook = ewmhDesktopsStartup
-         , terminal = "xfce4-terminal"
-         , focusedBorderColor = "purple"
-         , manageHook = manageDocks <+> manageHook defaultConfig
-         , layoutHook = smartSpacing 3 $ layoutHook defaultConfig
-         , borderWidth = 2
-         , handleEventHook = ewmhDesktopsEventHook
-         , logHook = ewmhDesktopsLogHook
-       	}
-                `additionalKeys`
-			[  ((mod4Mask, xK_p), spawn "rofi -show run ")
-		        ,  ((mod4Mask, xK_c), spawn "rofi -show calc ")
-		        ,  ((mod4Mask, xK_s), spawn "rofi -show emoji ")
-		        ,  ((mod4Mask, xK_a), spawn "rofi -show window ")
-		        ,  ((mod4Mask, xK_d), spawn "xfce4-dict")
-		        ,  ((mod4Mask, xK_g), spawn "xfce4-terminal -e vim")
-		        ,  ((mod4Mask, xK_x), spawn "xkill")
-                ]
-                `additionalKeysP`        
-                [ ("C-S-<Escape>", spawn "xfce4-terminal -e htop")
-                , ("M-S-d", spawn "speedreader")
-                , ("M-S-g", spawn "gvim")
-                , ("M-o", shellPrompt myPrompt)
-                ]
-  
+ -- Main configuration, override the defaults to your liking.
+ myConfig = def { 
+        modMask = mod4Mask 
+        , startupHook = ewmhDesktopsStartup
+        , terminal = "xterm"
+        , borderWidth = 3
+        , focusedBorderColor = "purple"
+        , handleEventHook = ewmhDesktopsEventHook
+        , logHook = ewmhDesktopsLogHook >> workspaceHistoryHook >> fadeInactiveLogHook 0.7
+        , layoutHook = myLayout
+    } `additionalKeysP`
+      [   (("M-z"), toggleWS)
+        , (("M-S-z"), shiftToPrev)
+        , (("M-f"), moveTo Next EmptyWS)
+        , (("M-S-f"), shiftTo Next EmptyWS)
+      ]
