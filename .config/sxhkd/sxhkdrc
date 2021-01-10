@@ -1,0 +1,111 @@
+super + shift + {F6, F7}
+     sudo keyboard-brightness {--decrease, --increase} 
+	
+super + {F6, F7}
+    xbacklight {-dec, -inc} 5
+	
+#back and forward
+super + {F1, F2}
+
+super + {F8, F9, F10}
+	pactl set-sink-{mute 0 toggle,volume 0 -5%,volume 0 +2%}
+
+super + a
+	rofi -show window	
+
+super + p 
+	rofi -show run
+
+control + backslash
+	kitty -e tmux
+
+super + Left
+	xdotool keyup Left key --clearmodifiers Page_Up
+
+super + Right
+	xdotool keyup Right key --clearmodifiers Page_Down
+
+super + Up
+	xdotool keyup Up key --clearmodifiers Home
+
+super + Down
+	xdotool keyup Down key --clearmodifiers End
+
+super + BackSpace
+	xdotool keyup BackSpace key --clearmodifiers Delete
+
+super + o; b
+	brave
+
+super + o; r
+	reaper
+
+super + o; i
+	inkscape
+
+super + o; m
+	mixxx
+
+super + o; g
+	gimp
+
+super + o; k
+	kdenlive
+
+super + o; f
+	firefox
+
+super + o; c
+	cadence
+
+super + o; d
+	goldendict
+
+XF86PowerOff
+	fish -c powerMenu
+
+super + Escape
+	kitty -e htop
+
+super + control + F4
+	fish -c screenshotRegion
+
+super + F4
+	fish -c screenshotDesktop
+
+super + alt + F4
+	fish -c screenshotWindow
+
+super + F5
+	arandr
+
+super + c 
+	rofi -show calc
+
+super + s
+	rofimoji
+
+super + v
+	rofi -modi "clipboard:greenclip print" -show clipboard -run-command '{cmd}'
+
+super + shift + x
+        xkill
+
+super + o; v
+        notify-send "Now Playing: " (xclip -o); xclip -o | xargs mpv --volume=70 
+
+super + y
+        notify-send "Now Playing: " (xclip -o); xclip -o | xargs mpv --ytdl-format=18 --volume=70 
+
+super + o; y
+        notify-send "Now Playing: " (xclip -o); xclip -o | xargs mpv --ytdl-format=18 --volume=70 
+
+super + o; n
+        xterm -e newsboat
+
+super + o; s
+        gutenflash
+
+super + {-, =}
+    	xdotool key {F11, F12}
+
